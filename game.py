@@ -14,7 +14,7 @@ class Game():
 		self.HOSTNAME = 'http://localhost:2390/'
 		self.warna = ['Red','Blue','Green','Pink','Black','Yellow','Orange','White','Purple','Brown']
 		self.skor = 0
-		self.durasi = 30
+		self.durasi = 3
 
 		self.GUI()
 
@@ -40,7 +40,7 @@ class Game():
 		self.lb.place(x=300,y=180)
 
 	def start(self,event):
-		if self.durasi == 30:
+		if self.durasi == 3:
 			self.countdown()
 		self.nextColor()
 
@@ -89,14 +89,26 @@ class Game():
 		dataa['score'] = self.skor
 		dataa['date'] = tanggal
 
-		req = requests.post(self.HOSTNAME+'api',data=dataa)
-		res = req.json()
+		try:
+			req = requests.post(self.HOSTNAME+'api',data=dataa)
+			res = req.json()
 
-		if res['status'] == "Success!":
-			self.save_score_input.pack_forget()
-			self.save_score_label.pack_forget()
-			self.save_score_button.pack_forget()
-			self.retrybtn()
+			if res['status'] == "Success!":
+				self.save_score_input.pack_forget()
+				self.save_score_label.pack_forget()
+				self.save_score_button.pack_forget()
+				self.retrybtn()
+			else:
+				print("Something Wrong!")
+
+		except:
+				self.offline_alert_label = tk.Label(self.main_frame,text="Request timed out. Can't connect to server",fg='red',font = ('Helvetica', 10, 'bold'))
+				self.offline_alert_label.pack()
+				self.offline_alert_label.after(2000, self.offline)
+
+	def offline(self):		
+		self.offline_alert_label.pack_forget()
+
 
 	def retrybtn(self):
 		self.retry_label = tk.Button(self.main_frame,text="Main Lagi",fg='green',font = ('Helvetica', 14, 'bold'),command=self.retry)
